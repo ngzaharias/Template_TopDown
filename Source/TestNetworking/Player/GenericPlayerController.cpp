@@ -3,6 +3,8 @@
 #include "TestNetworking.h"
 #include "GenericPlayerController.h"
 
+#include "Gameplay/GenericGameMode.h"
+#include "Gameplay/Characters/CharacterManager.h"
 #include "Gameplay/Characters/GenericCharacter.h"
 #include "Player/GenericPlayerPawn.h"
 
@@ -13,8 +15,13 @@
 
 AGenericPlayerController::AGenericPlayerController()
 {
-	bShowMouseCursor = true;
+	bShowMouseCursor = false;
 	DefaultMouseCursor = EMouseCursor::Crosshairs;
+}
+
+AGenericPlayerPawn* AGenericPlayerController::GetGenericPawn() const
+{
+	return Cast<AGenericPlayerPawn>(GetPawn());
 }
 
 void AGenericPlayerController::BeginPlay()
@@ -23,13 +30,6 @@ void AGenericPlayerController::BeginPlay()
 
 void AGenericPlayerController::BeginPlayingState()
 {
-	if (IsLocalPlayerController() == false)
-		return;
-
-	APawn* const pawn = GetPawn();
-	AGenericPlayerPawn* const playerPawn = Cast<AGenericPlayerPawn>(pawn);
-	UDecalComponent* const cursor = playerPawn->GetCursor();
-	cursor->SetVisibility(true);
 }
 
 void AGenericPlayerController::PlayerTick(float DeltaTime)
@@ -42,21 +42,103 @@ void AGenericPlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
 
-	InputComponent->BindAction("SetDestination", IE_Pressed, this, &AGenericPlayerController::Server_MoveToMouseCursor);
+	InputComponent->BindAction("SelectPrimary",		IE_Pressed, this, &AGenericPlayerController::SelectPrimary);
+	InputComponent->BindAction("SelectSecondary",	IE_Pressed, this, &AGenericPlayerController::SelectSecondary);
+	InputComponent->BindAction("SelectTertiary",	IE_Pressed, this, &AGenericPlayerController::SelectTertiary);
+	InputComponent->BindAction("SelectTertiary",	IE_Released, this, &AGenericPlayerController::SelectTertiary);
+
+	InputComponent->BindAxis("CameraHorizontal",	this, &AGenericPlayerController::CameraHorizontal);
+	InputComponent->BindAxis("CameraVertical",		this, &AGenericPlayerController::CameraVertical);
+	InputComponent->BindAxis("CameraYaw",			this, &AGenericPlayerController::CameraYaw);
+	InputComponent->BindAxis("CameraZoom",			this, &AGenericPlayerController::CameraZoom);
 }
 
-bool AGenericPlayerController::Server_MoveToMouseCursor_Validate()
+void AGenericPlayerController::CameraHorizontal(const float AxisValue)
+{
+	AGenericPlayerPawn* const playerPawn = GetGenericPawn();
+	if (playerPawn != nullptr)
+	{
+		playerPawn->MoveHorizontal(AxisValue);
+	}
+}
+
+void AGenericPlayerController::CameraVertical(const float AxisValue)
+{
+	AGenericPlayerPawn* const playerPawn = GetGenericPawn();
+	if (playerPawn != nullptr)
+	{
+		playerPawn->MoveVertical(AxisValue);
+	}
+}
+
+void AGenericPlayerController::CameraYaw(const float AxisValue)
+{
+	AGenericPlayerPawn* const playerPawn = GetGenericPawn();
+	if (playerPawn != nullptr)
+	{
+		playerPawn->AdjustYaw(AxisValue);
+	}
+}
+
+void AGenericPlayerController::CameraZoom(const float AxisValue)
+{
+	AGenericPlayerPawn* const playerPawn = GetGenericPawn();
+	if (playerPawn != nullptr)
+	{
+		playerPawn->AdjustZoom(AxisValue);
+	}
+}
+
+void AGenericPlayerController::SelectPrimary()
+{
+	FHitResult hit;
+	GetHitResultUnderCursor(ECC_Visibility, true, hit);
+	if (hit.bBlockingHit)
+	{
+		Server_SelectPrimary(hit.Location);
+	}
+}
+
+void AGenericPlayerController::SelectSecondary()
+{
+}
+
+void AGenericPlayerController::SelectTertiary()
+{
+	AGenericPlayerPawn* const playerPawn = GetGenericPawn();
+	if (playerPawn != nullptr)
+	{
+		playerPawn->ToggleYawAdjustments();
+	}
+}
+
+bool AGenericPlayerController::Client_BeginPlayingState_Validate()
 {
 	return true;
 }
 
-void AGenericPlayerController::Server_MoveToMouseCursor_Implementation()
+void AGenericPlayerController::Client_BeginPlayingState_Implementation()
 {
-	// Trace to see what is under the mouse cursor
-	FHitResult Hit;
-	GetHitResultUnderCursor(ECC_Visibility, false, Hit);
+	const AGenericPlayerPawn* const playerPawn = GetGenericPawn();
+	UDecalComponent* const cursor = playerPawn->GetCursor();
+	cursor->SetVisibility(true);
+}
 
-	if (Hit.bBlockingHit)
-	{
-	}
+bool AGenericPlayerController::Server_SelectPrimary_Validate(FVector Location)
+{
+	return true;
+}
+
+void AGenericPlayerController::Server_SelectPrimary_Implementation(FVector Location)
+{
+	const AGenericGameMode* const gameMode = (AGenericGameMode*)GetWorld()->GetAuthGameMode();
+	ACharacterManager* const characterManager = gameMode->GetCharacterManager();
+	ACharacter* const playerCharacter = characterManager->GetCharacterFromPlayer(this);
+
+	checkf(playerCharacter, TEXT("Character is null! Player doesn't have a character assigned to them."));
+	if (playerCharacter == nullptr)
+		return;
+
+	AController* controller = playerCharacter->GetController();
+	UNavigationSystem::SimpleMoveToLocation(controller, Location);
 }

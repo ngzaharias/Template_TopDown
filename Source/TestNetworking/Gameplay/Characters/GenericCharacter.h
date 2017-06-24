@@ -11,8 +11,9 @@ class AGenericCharacter : public ACharacter
 public:
 	AGenericCharacter();
 
-	// Called every frame.
 	virtual void Tick(float DeltaSeconds) override;
+
+	void MoveToLocation(FVector Location);
 
 };
 

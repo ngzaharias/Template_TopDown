@@ -25,3 +25,8 @@ void AGenericCharacter::Tick(float DeltaSeconds)
 
 	
 }
+
+void AGenericCharacter::MoveToLocation(FVector Location)
+{
+
+}

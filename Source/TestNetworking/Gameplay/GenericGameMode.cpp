@@ -19,23 +19,35 @@ AGenericGameMode::AGenericGameMode()
 	PlayerControllerClass = AGenericPlayerController::StaticClass();
 	GameStateClass = AGenericGameState::StaticClass();
 	PlayerStateClass = AGenericPlayerState::StaticClass();
+}
+
+void AGenericGameMode::InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage)
+{
+	Super::InitGame(MapName, Options, ErrorMessage);
 
 	FActorSpawnParameters CharacterManagerParams;
 	CharacterManagerParams.ObjectFlags |= RF_Transient;
-	CharacterManager = NewObject<ACharacterManager>();
+	m_CharacterManager = NewObject<ACharacterManager>();
+	m_CharacterManager->Init(GetWorld());
 }
 
 void AGenericGameMode::PreLogin(const FString & Options, const FString & Address, const FUniqueNetIdRepl& UniqueId, FString & ErrorMessage)
 {
-	AGameModeBase::PreLogin(Options, Address, UniqueId, ErrorMessage);
+	Super::PreLogin(Options, Address, UniqueId, ErrorMessage);
 }
 
 void AGenericGameMode::PostLogin(APlayerController * NewPlayer)
 {
-	AGameModeBase::PostLogin(NewPlayer);
+	Super::PostLogin(NewPlayer);
 
-	ACharacter* Character = NULL;
 	FActorSpawnParameters SpawnParameters;
-	CharacterManager->CreateCharacter(CharacterClass, SpawnParameters, Character, NewPlayer);
+	ACharacter* Character = m_CharacterManager->CreateCharacter(CharacterClass, SpawnParameters);
+	if (Character != nullptr)
+	{
+		m_CharacterManager->RegisterCharacter(Character);
+		m_CharacterManager->RegisterPlayer(NewPlayer);
+		m_CharacterManager->AssignCharacterToPlayer(NewPlayer, Character);
+		Character->SetActorLocation(NewPlayer->GetSpawnLocation());
+	}
 }
 

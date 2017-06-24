@@ -5,7 +5,9 @@
 
 #include "EngineMinimal.h"
 
-DECLARE_LOG_CATEGORY_EXTERN(LogTestNetworking, Log, All);
-
+DECLARE_LOG_CATEGORY_EXTERN(LogCamera, Log, All)
+DECLARE_LOG_CATEGORY_EXTERN(LogCharacter, Log, All)
+DECLARE_LOG_CATEGORY_EXTERN(LogCharacterManager, Log, All)
+DECLARE_LOG_CATEGORY_EXTERN(LogPlayer, Log, All)
 
 #endif

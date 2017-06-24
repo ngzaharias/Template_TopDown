@@ -9,68 +9,142 @@ ACharacterManager::ACharacterManager()
 {
 }
 
-void ACharacterManager::Init()
+UWorld* ACharacterManager::GetWorld() const 
+{ 
+	checkf(m_World != nullptr, TEXT("Trying to use CharacterManager with an null m_World."));
+	return m_World; 
+}
+
+void ACharacterManager::Init(class UWorld* World)
 {
+	checkf(World != nullptr, TEXT("Trying to Init CharacterManager with a null UWorld."));
+	m_World = World;
 }
 
 void ACharacterManager::Reset()
 {
-	Characters.Empty();
-	CharacterToPlayerMap.Empty(0);
-	PlayerToCharacterMap.Empty(0);
+	m_CharacterToPlayerMap.Empty(0);
+	m_PlayerToCharacterMap.Empty(0);
 }
 
-bool ACharacterManager::AssignCharacterToPlayer(ACharacter* Character, APlayerController* Player)
+bool ACharacterManager::IsCharacterAssigned(class ACharacter* Character, class APlayerController* Player /*= nullptr*/)
+{ 
+	if (Player != nullptr)
+		return m_CharacterToPlayerMap[Character] == Player;
+	return m_CharacterToPlayerMap[Character] != nullptr; 
+}
+
+bool ACharacterManager::IsPlayerAssigned(class APlayerController* Player, class ACharacter* Character /*= nullptr*/)
 {
-	if (IsCharacterAssigned(Character) == true)
+	if (Character != nullptr)
+		return m_PlayerToCharacterMap[Player] == Character;
+	return m_PlayerToCharacterMap[Player] != nullptr;
+}
+
+bool ACharacterManager::AssignCharacterToPlayer(class APlayerController* Player, class ACharacter* NewCharacter /*= nullptr*/)
+{
+	if (NewCharacter != nullptr && IsCharacterAssigned(NewCharacter))
+	{
+		UE_LOG(LogCharacterManager, Warning, TEXT("Trying to assign a an already assigned character to another player."));
 		return false;
+	}
 
-	// clear the player for the current player's character
-	const ACharacter* const CurrentCharacter = PlayerToCharacterMap[Player];
-	CharacterToPlayerMap[CurrentCharacter] = NULL;
-
+	// take the current character and clear its player
+	ACharacter* const CurrentCharacter = m_PlayerToCharacterMap[Player];
+	if (CurrentCharacter != nullptr)
+	{
+		m_CharacterToPlayerMap[CurrentCharacter] = nullptr;
+	}
 	// assign the new character to the player
-	CharacterToPlayerMap[Character] = Player;
-	PlayerToCharacterMap[Player] = Character;
+	if (NewCharacter != nullptr)
+	{
+		m_CharacterToPlayerMap[NewCharacter] = Player;
+	}
+
+	m_PlayerToCharacterMap[Player] = NewCharacter;
 	return true;
 }
 
-bool ACharacterManager::CreateCharacter(UClass* Class, const FActorSpawnParameters& SpawnParameters, ACharacter* out_Character, APlayerController* OwningPlayer /*= NULL*/)
+bool ACharacterManager::AssignPlayerToCharacter(class ACharacter* Character, class APlayerController* NewPlayer /*= nullptr*/)
 {
-	//out_Character = GetWorld()->SpawnActor<ACharacter>(Class, SpawnParameters);
-	if (out_Character == NULL)
+	if (NewPlayer != nullptr && IsPlayerAssigned(NewPlayer))
+	{
+		UE_LOG(LogCharacterManager, Warning, TEXT("Trying to assign a an already assigned player to another character."));
 		return false;
+	}
 
-	return RegisterCharacter(out_Character, OwningPlayer);
+	// take the current player and clear its character
+	APlayerController* const CurrentPlayer = m_CharacterToPlayerMap[Character];
+	if (CurrentPlayer != nullptr)
+	{
+		m_PlayerToCharacterMap[CurrentPlayer] = nullptr;
+	}
+	// assign the new player to the character
+	if (NewPlayer != nullptr)
+	{
+		m_PlayerToCharacterMap[NewPlayer] = Character;
+	}
+
+	m_CharacterToPlayerMap[Character] = NewPlayer;
+	return true;
 }
 
-bool ACharacterManager::RegisterCharacter(ACharacter* Character, APlayerController* OwningPlayer /*= NULL*/)
+ACharacter* ACharacterManager::CreateCharacter(UClass* Class, const FActorSpawnParameters& SpawnParameters)
 {
-	if (Character == NULL)
+	ACharacter* Character = GetWorld()->SpawnActor<ACharacter>(Class, SpawnParameters);
+	if (Character == nullptr)
+	{
+		UE_LOG(LogCharacterManager, Error, TEXT("Couldn't create character."));
+		return nullptr;
+	}
+
+	Character->SpawnDefaultController();
+	return Character;
+}
+
+bool ACharacterManager::RegisterCharacter(ACharacter* Character)
+{
+	if (Character == nullptr)
+	{
+		UE_LOG(LogCharacterManager, Warning, TEXT("Trying to register a null character."));
 		return false;
+	}
 
 	if (IsCharacterRegistered(Character) == true)
+	{
+		UE_LOG(LogCharacterManager, Warning, TEXT("Character has already been registered."));
 		return false;
+	}
 
-	Characters.Add(Character);
-	CharacterToPlayerMap[Character] = OwningPlayer;
-	PlayerToCharacterMap[OwningPlayer] = Character;
+	m_CharacterToPlayerMap.Emplace(Character, nullptr);
 	return true;
 }
 
-bool ACharacterManager::RegisterPlayer(APlayerController* Player, ACharacter* Character)
+bool ACharacterManager::RegisterPlayer(APlayerController* Player)
 {
-	if (Character == NULL || Player == NULL)
+	if (Player == nullptr)
+	{
+		UE_LOG(LogCharacterManager, Warning, TEXT("Trying to register a null player."));
 		return false;
+	}
 
-	if (IsCharacterAssigned(Character) == true)
+	if (IsPlayerRegistered(Player) == true)
+	{
+		UE_LOG(LogCharacterManager, Warning, TEXT("Player has already been registered."));
 		return false;
+	}
 
-	Characters.AddUnique(Character);
-	CharacterToPlayerMap[Character] = Player;
-	PlayerToCharacterMap[Player] = Character;
+	m_PlayerToCharacterMap.Emplace(Player, nullptr);
 	return true;
 }
+
+//UE_LOG
+//(
+//	LogCharacterManager,
+//	Warning,
+//	TEXT("Trying to register a player with an already assigned character. \
+//		You should check that the character is available before trying to re-assign it.")
+//);
 
 
 

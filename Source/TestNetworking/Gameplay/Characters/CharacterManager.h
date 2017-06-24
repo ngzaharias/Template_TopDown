@@ -2,43 +2,52 @@
 
 #pragma once
 
-#include "GameFramework/Info.h"
+#include <GameFramework/Info.h>
 #include "CharacterManager.generated.h"
 
 /**
- * 
+ *
  */
-UCLASS()
-class TESTNETWORKING_API ACharacterManager : public AInfo
+UCLASS(NotPlaceable)
+class TESTNETWORKING_API ACharacterManager
+	: public AInfo
 {
 	GENERATED_BODY()
 
 public:
 	ACharacterManager();
 
-	void Init();
+	UWorld* GetWorld() const override;
+
+	void Init(class UWorld* World);
 	void Reset();
 
-	class ACharacter* GetPlayersCharacter(class APlayerController* Player) { return PlayerToCharacterMap[Player]; }
-	class APlayerController* GetCharactersPlayer(class ACharacter* Character) { return CharacterToPlayerMap[Character]; }
+	class ACharacter* GetCharacterFromPlayer(class APlayerController* Player) { return m_PlayerToCharacterMap[Player]; }
+	class APlayerController* GetPlayerFromCharacter(class ACharacter* Character) { return m_CharacterToPlayerMap[Character]; }
 
-	bool IsCharacterAssigned(class ACharacter* Character) { return CharacterToPlayerMap[Character] != NULL; }
-	bool IsCharacterRegistered(class ACharacter* Character) { return Characters.Find(Character) != INDEX_NONE; }
+	bool IsCharacterAssigned(class ACharacter* Character, class APlayerController* Player = nullptr);
+	bool IsPlayerAssigned(class APlayerController* Player, class ACharacter* Character = nullptr);
 
-	bool AssignCharacterToPlayer(class ACharacter* Character, class APlayerController* OwningPlayer);
-	bool CreateCharacter(class UClass* Class, const FActorSpawnParameters& SpawnParameters, class ACharacter* out_Character, APlayerController* OwningPlayer = NULL);
-	bool RegisterCharacter(class ACharacter* Character, class APlayerController* Player = NULL);
-	bool RegisterPlayer(class APlayerController* Player, class ACharacter* Character);
+	bool IsCharacterRegistered(class ACharacter* Character) { return m_CharacterToPlayerMap.Contains(Character); }
+	bool IsPlayerRegistered(class APlayerController* Player) { return m_PlayerToCharacterMap.Contains(Player); }
 
-	
+	class ACharacter* CreateCharacter(class UClass* Class, const FActorSpawnParameters& SpawnParameters);
+
+	bool AssignCharacterToPlayer(class APlayerController* Player, class ACharacter* Character = nullptr);
+	bool AssignPlayerToCharacter(class ACharacter* Character, class APlayerController* Player = nullptr);
+
+	bool RegisterCharacter(class ACharacter* Character);
+	bool RegisterPlayer(class APlayerController* Player);
+
+
 protected:
-	UPROPERTY() 
-	TArray<class ACharacter*> Characters;
+	UPROPERTY()
+		TMap<class ACharacter*, class APlayerController*> m_CharacterToPlayerMap;
 
-	UPROPERTY() 
-	TMap<class ACharacter*, class APlayerController*> CharacterToPlayerMap;
+	UPROPERTY()
+		TMap<class APlayerController*, class ACharacter*> m_PlayerToCharacterMap;
 
-	UPROPERTY() 
-	TMap<class APlayerController*, class ACharacter*> PlayerToCharacterMap;
-	
+private:
+	class UWorld* m_World = nullptr;
+
 };

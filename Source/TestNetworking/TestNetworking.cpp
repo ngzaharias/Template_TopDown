@@ -5,5 +5,8 @@
 
 IMPLEMENT_PRIMARY_GAME_MODULE( FDefaultGameModuleImpl, TestNetworking, "TestNetworking" );
 
-DEFINE_LOG_CATEGORY(LogTestNetworking)
+DEFINE_LOG_CATEGORY(LogCamera)
+DEFINE_LOG_CATEGORY(LogCharacter)
+DEFINE_LOG_CATEGORY(LogCharacterManager)
+DEFINE_LOG_CATEGORY(LogPlayer)
  

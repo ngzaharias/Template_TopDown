@@ -11,35 +11,57 @@ class TESTNETWORKING_API AGenericPlayerPawn : public APawn
 	GENERATED_BODY()
 
 public:
-	// Sets default values for this pawn's properties
 	AGenericPlayerPawn();
 
-protected:
-	// Called when the game starts or when spawned
-	void BeginPlay() override;
+	FORCEINLINE class UCameraComponent* GetCamera() const { return m_Camera; }
+	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return m_CameraBoom; }
+	FORCEINLINE class UDecalComponent* GetCursor() const { return m_Cursor; }
+	FORCEINLINE class UPawnMovementComponent* GetMovementComponent() const override { return m_MovementComponent; }
 
-public:	
-	// Called every frame
 	void Tick(float DeltaTime) override;
-
-	// Called to bind functionality to input
 	void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	FORCEINLINE class UCameraComponent* GetCamera() const { return Camera; }
-	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
-	FORCEINLINE class UDecalComponent* GetCursor() { return Cursor; }
+	void AdjustYaw(const float AxisValue);
+	void AdjustZoom(const float AxisValue);
+	void MoveHorizontal(const float AxisValue);
+	void MoveVertical(const float AxisValue);
+	void ToggleYawAdjustments();
 
+	/* CLIENT */
+
+	/* SERVER */
+
+
+protected:
+	void BeginPlay() override;
+
+public:
 private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	class USceneComponent* Root;
+		class USceneComponent* m_Root = nullptr;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	class UCameraComponent* Camera;
+		class UCameraComponent* m_Camera = nullptr;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	class USpringArmComponent* CameraBoom;
+		class USpringArmComponent* m_CameraBoom = nullptr;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	class UDecalComponent* Cursor;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Cursor, meta = (AllowPrivateAccess = "true"))
+		class UDecalComponent* m_Cursor = nullptr;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
+		class UPawnMovementComponent* m_MovementComponent = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+		float m_AdjustYawSpeed = 3.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+		float m_AdjustZoomSpeed = 1.f;
+
+	bool m_bIsCameraRotateEnabled = false;
+
+	/* CLIENT */
+
+	/* SERVER */
 };

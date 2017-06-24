@@ -14,10 +14,11 @@ public class TestNetworkingTarget : TargetRules
 	// TargetRules interface.
 	//
 
-	public override void SetupBinaries(
-		TargetInfo Target,
-		ref List<UEBuildBinaryConfiguration> OutBuildBinaryConfigurations,
-		ref List<string> OutExtraModuleNames
+	public override void SetupBinaries
+		(
+			TargetInfo Target,
+			ref List<UEBuildBinaryConfiguration> OutBuildBinaryConfigurations,
+			ref List<string> OutExtraModuleNames
 		)
 	{
 		OutExtraModuleNames.Add("TestNetworking");

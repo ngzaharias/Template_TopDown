@@ -6,6 +6,17 @@ public class TestNetworking : ModuleRules
 {
 	public TestNetworking(TargetInfo Target)
 	{
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "HeadMountedDisplay" });
+		PublicDependencyModuleNames.AddRange(new string[] 
+		{
+			"Core",
+			"CoreUObject",
+			"Engine",
+			"InputCore",
+			"HeadMountedDisplay",
+		});
+
+		//PublicIncludePaths.AddRange(new string[] 
+		//{
+		//});
 	}
 }
