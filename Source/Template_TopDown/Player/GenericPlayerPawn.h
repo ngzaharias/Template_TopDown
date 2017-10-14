@@ -6,7 +6,7 @@
 #include "GenericPlayerPawn.generated.h"
 
 UCLASS()
-class TESTNETWORKING_API AGenericPlayerPawn : public APawn
+class TEMPLATE_TOPDOWN_API AGenericPlayerPawn : public APawn
 {
 	GENERATED_BODY()
 

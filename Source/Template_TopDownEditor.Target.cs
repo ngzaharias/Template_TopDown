@@ -3,9 +3,9 @@
 using UnrealBuildTool;
 using System.Collections.Generic;
 
-public class TestNetworkingEditorTarget : TargetRules
+public class Template_TopDownEditorTarget : TargetRules
 {
-	public TestNetworkingEditorTarget(TargetInfo Target)
+	public Template_TopDownEditorTarget(TargetInfo Target)
 	{
 		Type = TargetType.Editor;
 	}
@@ -21,6 +21,6 @@ public class TestNetworkingEditorTarget : TargetRules
 			ref List<string> OutExtraModuleNames
 		)
 	{
-		OutExtraModuleNames.Add("TestNetworking");
+		OutExtraModuleNames.Add("Template_TopDown");
 	}
 }

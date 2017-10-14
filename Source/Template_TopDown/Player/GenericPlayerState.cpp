@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "TestNetworking.h"
-#include "GenericGameState.h"
+#include "Template_TopDown.h"
+#include "GenericPlayerState.h"
 
 
 

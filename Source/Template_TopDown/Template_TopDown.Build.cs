@@ -2,9 +2,9 @@
 
 using UnrealBuildTool;
 
-public class TestNetworking : ModuleRules
+public class Template_TopDown : ModuleRules
 {
-	public TestNetworking(TargetInfo Target)
+	public Template_TopDown(TargetInfo Target)
 	{
 		PublicDependencyModuleNames.AddRange(new string[] 
 		{

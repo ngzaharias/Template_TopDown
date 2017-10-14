@@ -1,6 +1,6 @@
 // Copyright 1998-2017 Epic Games, Inc. All Rights Reserved.
 
-#include "TestNetworking.h"
+#include "Template_TopDown.h"
 #include "GenericCharacter.h"
 
 AGenericCharacter::AGenericCharacter()

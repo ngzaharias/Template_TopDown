@@ -9,7 +9,7 @@
  *
  */
 UCLASS(NotPlaceable)
-class TESTNETWORKING_API ACharacterManager
+class TEMPLATE_TOPDOWN_API ACharacterManager
 	: public AInfo
 {
 	GENERATED_BODY()

@@ -1,7 +1,7 @@
 // Copyright 1998-2017 Epic Games, Inc. All Rights Reserved.
 
-#ifndef __TESTNETWORKING_H__
-#define __TESTNETWORKING_H__
+#ifndef __TEMPLATE_TOPDOWN_H__
+#define __TEMPLATE_TOPDOWN_H__
 
 #include "EngineMinimal.h"
 

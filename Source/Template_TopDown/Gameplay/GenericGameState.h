@@ -9,7 +9,7 @@
  * 
  */
 UCLASS()
-class TESTNETWORKING_API AGenericGameState : public AGameStateBase
+class TEMPLATE_TOPDOWN_API AGenericGameState : public AGameStateBase
 {
 	GENERATED_BODY()
 	

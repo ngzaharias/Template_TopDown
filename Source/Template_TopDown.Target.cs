@@ -3,9 +3,9 @@
 using UnrealBuildTool;
 using System.Collections.Generic;
 
-public class TestNetworkingTarget : TargetRules
+public class Template_TopDownTarget : TargetRules
 {
-	public TestNetworkingTarget(TargetInfo Target)
+	public Template_TopDownTarget(TargetInfo Target)
 	{
 		Type = TargetType.Game;
 	}
@@ -21,6 +21,6 @@ public class TestNetworkingTarget : TargetRules
 			ref List<string> OutExtraModuleNames
 		)
 	{
-		OutExtraModuleNames.Add("TestNetworking");
+		OutExtraModuleNames.Add("Template_TopDown");
 	}
 }
