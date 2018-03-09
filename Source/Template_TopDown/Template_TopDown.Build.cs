@@ -4,7 +4,7 @@ using UnrealBuildTool;
 
 public class Template_TopDown : ModuleRules
 {
-	public Template_TopDown(TargetInfo Target)
+	public Template_TopDown(ReadOnlyTargetRules Target)
 	{
 		PublicDependencyModuleNames.AddRange(new string[] 
 		{

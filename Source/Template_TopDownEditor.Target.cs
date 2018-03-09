@@ -6,21 +6,9 @@ using System.Collections.Generic;
 public class Template_TopDownEditorTarget : TargetRules
 {
 	public Template_TopDownEditorTarget(TargetInfo Target)
+		: base(Target)
 	{
 		Type = TargetType.Editor;
-	}
-
-	//
-	// TargetRules interface.
-	//
-
-	public override void SetupBinaries
-		(
-			TargetInfo Target,
-			ref List<UEBuildBinaryConfiguration> OutBuildBinaryConfigurations,
-			ref List<string> OutExtraModuleNames
-		)
-	{
-		OutExtraModuleNames.Add("Template_TopDown");
+		ExtraModuleNames.Add("Template_TopDown");
 	}
 }
